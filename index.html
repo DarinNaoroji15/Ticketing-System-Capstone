@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ticket System</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 0;
+  }
+
+  .container {
+    max-width: 700px;
+    margin: 50px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  h2 {
+    text-align: center;
+    color: #333;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+
+  button:hover {
+    background: #1e40af;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .ticket {
+    background: #fafafa;
+    border: 1px solid #eee;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .status {
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    background: #e5e7eb;
+    margin-left: 10px;
+  }
+
+  .closed {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .open {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .ticket-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .title {
+    font-weight: bold;
+  }
+
+  .desc {
+    font-size: 13px;
+    color: #666;
+  }
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Ticket System</h2>
+
+  <div class="form">
+    <input id="title" placeholder="Ticket title">
+    <input id="desc" placeholder="Ticket description">
+    <button onclick="createTicket()">Create Ticket</button>
+  </div>
+
+  <ul id="tickets"></ul>
+</div>
+
+<script>
+async function createTicket() {
+  await fetch("http://localhost:3000/tickets", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      title: document.getElementById("title").value,
+      description: document.getElementById("desc").value
+    })
+  });
+
+  document.getElementById("title").value = "";
+  document.getElementById("desc").value = "";
+
+  loadTickets();
+}
+
+async function loadTickets() {
+  const res = await fetch("http://localhost:3000/tickets");
+  const data = await res.json();
+
+  const list = document.getElementById("tickets");
+  list.innerHTML = "";
+
+  data.forEach(t => {
+    const li = document.createElement("li");
+    li.className = "ticket";
+
+    li.innerHTML = `
+  <div class="ticket-left">
+    <div class="title">${t.title}
+      <span class="status ${t.status}">${t.status}</span>
+    </div>
+    <div class="desc">${t.description}</div>
+  </div>
+
+  <div>
+    ${statusButtons}
+  </div>
+`;
+
+async function setStatus(id, status) {
+  await fetch(`http://localhost:3000/tickets/${id}`, {
+    method: "PUT",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ status })
+  });
+
+  loadTickets();
+}
+
+async function closeTicket(id) {
+  await fetch(`http://localhost:3000/tickets/${id}`, {
+    method: "PUT",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ status: "closed" })
+  });
+
+  loadTickets();
+}
+
+loadTickets();
+</script>
+
+</body>
+</html>
