@@ -6,4 +6,6 @@ This project is a display of a ticketing system created through Command Prompt a
 
 <img width="957" height="392" alt="image" src="https://github.com/user-attachments/assets/46ab0667-3f7e-473a-86ee-5128f7ae3d63" />
 
-It is running locally and this is the basic UI when you open the HTML Document. 
+It is running locally and this is the basic UI when you open the HTML file. 
+
+
